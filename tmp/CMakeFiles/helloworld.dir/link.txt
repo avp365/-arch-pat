@@ -1,1 +1,0 @@
-/usr/bin/c++    -rdynamic CMakeFiles/helloworld.dir/main.cpp.o  -o helloworld  liblib.a -lpthread 
