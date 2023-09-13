@@ -1,0 +1,18 @@
+name: GitHub Actions Demo
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on: [push]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    # install dependencies
+    - name: boost
+      run: sudo apt-get install build-essential g++ python3-dev autotools-dev libicu-dev libbz2-dev libboost-all-dev
+    # build project
+    - name: mkdir
+      run: mkdir tmp
+    - name:  build
+      run: make build
+    - name: test
+      run: make test
