@@ -11,6 +11,6 @@ jobs:
       run: sudo apt-get install build-essential g++ python3-dev autotools-dev libicu-dev libbz2-dev libboost-all-dev
     # build project
     - name: mkdir
-      run: mkdir build
+      run: mkdir tmp
     - name:  build
       run: make build
