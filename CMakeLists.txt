@@ -1,18 +1,18 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(helloworld)
+project(task)
 
 find_package(Threads REQUIRED)
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
 configure_file(version.h.in ${PROJECT_SOURCE_DIR}/version.h)
 
-add_executable(helloworld main.cpp)
+add_executable(task main.cpp)
 add_library(lib lib.cpp)
 
 add_executable(test_version test_version.cpp)
 
-set_target_properties(helloworld lib test_version PROPERTIES
+set_target_properties(task lib test_version PROPERTIES
         CXX_STANDARD 17
         CXX_STANDARD_REQUIRED ON
         COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
@@ -23,7 +23,7 @@ set_target_properties(test_version PROPERTIES
         INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
 )
 
-target_link_libraries(helloworld
+target_link_libraries(task
         lib
         Threads::Threads
  )
@@ -33,13 +33,13 @@ target_link_libraries(test_version
         lib
 )
 
-install(TARGETS helloworld RUNTIME DESTINATION bin)
+install(TARGETS task RUNTIME DESTINATION bin)
 
 set(CPACK_GENERATOR DEB)
 
-set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
-set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
+set(CPACK_PACKAGE_VERSION_MAJOR "1")
+set(CPACK_PACKAGE_VERSION_MINOR "1")
+set(CPACK_PACKAGE_VERSION_PATCH "1")
 
 
 
@@ -51,4 +51,4 @@ include(CPack)
 
 enable_testing()
 
-add_test(helloworld test_version)
+add_test(task test_version)

@@ -1,8 +1,8 @@
 run:
-	@go run ./cmd/app
+	@cd ./tmp;./task
 
 build:
-	@cd ./tmp; cmake ..; cmake --build .
+	@mkdir tmp -p;cd ./tmp; cmake ..; cmake --build .
 
 test:
 	@cd ./tmp; cmake --build . --target test;

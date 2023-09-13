@@ -14,5 +14,5 @@ jobs:
       run: mkdir tmp
     - name:  build
       run: make build
-    - name:  build
+    - name: test
       run: make test
