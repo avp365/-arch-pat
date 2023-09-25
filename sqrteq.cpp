@@ -12,10 +12,6 @@ std::vector<double> Sqrteq::solve(double a, double b, double c)
         return {};
     }
 
-    std::cout << "a " << a << "\n";
-    std::cout << "b " << b << "\n";
-    std::cout << "c " << c << "\n";
-
     if (abs(a) <= Sqrteq::e)
     {
         throw std::invalid_argument("a b, c не должно быть меньше " + std::to_string(Sqrteq::e));
@@ -29,8 +25,6 @@ std::vector<double> Sqrteq::solve(double a, double b, double c)
     double x1, x2, D;
 
     D = b * b - 4 * a * c;
-
-    std::cout << "D " << D << "\n";
 
     if (D < -Sqrteq::e)
     {
