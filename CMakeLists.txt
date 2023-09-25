@@ -5,20 +5,20 @@ project(task)
 find_package(Threads REQUIRED)
 find_package(Boost COMPONENTS unit_test_framework REQUIRED)
 
-configure_file(version.h.in ${PROJECT_SOURCE_DIR}/version.h)
+
 
 add_executable(task main.cpp)
-add_library(lib lib.cpp)
+add_library(lib sqrteq.cpp)
 
-add_executable(test_version test_version.cpp)
+add_executable(test_sqrteq test_sqrteq.cpp)
 
-set_target_properties(task lib test_version PROPERTIES
+set_target_properties(task lib test_sqrteq PROPERTIES
         CXX_STANDARD 17
         CXX_STANDARD_REQUIRED ON
         COMPILE_OPTIONS "-Wpedantic;-Wall;-Wextra"
 )
 
-set_target_properties(test_version PROPERTIES
+set_target_properties(test_sqrteq PROPERTIES
         COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
         INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
 )
@@ -28,7 +28,7 @@ target_link_libraries(task
         Threads::Threads
  )
 
-target_link_libraries(test_version
+target_link_libraries(test_sqrteq
         ${Boost_LIBRARIES}
         lib
 )
@@ -51,4 +51,4 @@ include(CPack)
 
 enable_testing()
 
-add_test(task test_version)
+add_test(test_sqrteq test_sqrteq)
