@@ -14,7 +14,7 @@ std::vector<double> Sqrteq::solve(double a, double b, double c)
 
     if (abs(a) <= Sqrteq::e)
     {
-        throw std::invalid_argument("a b, c не должно быть меньше " + std::to_string(Sqrteq::e));
+        throw std::invalid_argument("a не должно быть меньше " + std::to_string(Sqrteq::e));
     }
 
     if (abs(b) > Sqrteq::max)
