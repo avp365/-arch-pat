@@ -2,82 +2,52 @@ package util
 
 import (
 	"errors"
+	"math"
 )
 
-// ReverseInt - function to reverse int. For example 123 -> 321
-func ReverseInt(x interface{}) (int, error) {
-	y, ok := x.(int)
-	if !ok {
-		return 0, errors.New("not int")
-	}
-
-	var result int
-	for y != 0 {
-		result = result*10 + y%10
-		if result > 2147483647 || result < -2147483648 {
-			return 0, nil
-		}
-
-		y /= 10
-	}
-
-	return result, nil
+type Sqrteq struct {
 }
 
-// ContainsDuplicate - check int array for duplicate. For example [1, 1, 2, 3] -> true
-func ContainsDuplicate(nums []int) bool {
-	set := make(map[int]struct{})
-	for _, v := range nums {
-		if _, ok := set[v]; ok {
-			return true
-		}
+func (sqrteq *Sqrteq) GetE() float64 {
 
-		set[v] = struct{}{}
-	}
-
-	return false
+	return 0.0001
 }
 
-// IsPalindrome - check integer for polindrome. For example 101 -> true, 123 -> false
-func IsPalindrome(x int) bool {
-	if x < 0 || (x%10 == 0 && x != 0) {
-		return false
+func (sqrteq *Sqrteq) Solve(a float64, b float64, c float64) ([]float64, error) {
+
+	var x1, x2 float64
+
+	if isFinite(a) || isFinite(b) || isFinite(c) {
+		return []float64{}, nil
 	}
 
-	var revertedNum int
-	for x > revertedNum {
-		last := x % 10
-		x /= 10
-		revertedNum = revertedNum*10 + last
+	if math.Abs(a) <= sqrteq.GetE() {
+		return []float64{}, errors.New("something didn't work")
 	}
 
-	return x == revertedNum || x == revertedNum/10
+	D := b*b - 4*a*c
+
+	if D < -sqrteq.GetE() {
+		return []float64{}, nil
+	}
+
+	if D <= sqrteq.GetE() {
+		x1 = (-1 * b) / (2 * a)
+
+		return []float64{x1, x1}, nil
+	}
+
+	if D > sqrteq.GetE() {
+		x1 = (-1*b + math.Sqrt(D)) / (2 * a)
+
+		x2 = (-1*b - math.Sqrt(D)) / (2 * a)
+
+		return []float64{x1, x2}, nil
+	}
+
+	return []float64{}, nil
 }
 
-// Fib - calculate fibanachi num. For example 10 -> 34
-func Fib(n int) int {
-	if n < 2 {
-		return n
-	}
-
-	return Fib(n-1) + Fib(n-2)
-}
-
-// MakeSlice - make new slice with size and put zero for all cell. For example 3 -> [0, 0, 0]
-func MakeSlice(l int) []int {
-	a := make([]int, 0)
-	for i := 0; i < l; i++ {
-		a = append(a, i)
-	}
-
-	return a
-}
-
-// Pad - make new string with template data. For example ("a", 3, "b") -> "abbb"
-func Pad(s string, length int, template string) string {
-	for len(s) < length {
-		s += template
-	}
-
-	return s
+func isFinite(num float64) bool {
+	return math.IsInf(num, 0) || math.IsNaN(num)
 }

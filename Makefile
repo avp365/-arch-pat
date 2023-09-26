@@ -5,3 +5,6 @@ run:
 
 build:
 	@go build ./cmd/app
+
+test:
+	@go test -v ./internal/pkg/util/
