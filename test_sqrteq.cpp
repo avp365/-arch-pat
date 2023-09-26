@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(d_less_e)
     BOOST_CHECK(s.solve(0.0001, 0.0001, 0.0001).empty() == 0);
 }
 
-// Проверка на бесконечность a
+// Проверка на бесконечность a b c
 
 BOOST_AUTO_TEST_CASE(test_infinity_a_b_c)
 {
