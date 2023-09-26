@@ -2,7 +2,7 @@ name: GitHub Actions Demo
 run-name: ${{ github.actor }} is  task🚀
 on: [push]
 jobs:
-  Explore-GitHub-Actions:
+  build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -14,7 +14,7 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: '1.21.x'
-    - name: test
-      run: go test -v ./internal/pkg/util/
-    - name:  build
-      run: make build
+      - name: test
+        run: go test -v ./internal/pkg/util/
+      - name:  build
+        run: make build
