@@ -8,11 +8,6 @@ type Move struct {
 	Obj ObjInterface
 }
 
-type Pos struct {
-	X int
-	Y int
-}
-
 func (m *Move) GetPosition() (Pos, error) {
 
 	p, ok := m.Obj.GetParameter("position").(map[string]int)
