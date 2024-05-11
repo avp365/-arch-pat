@@ -95,7 +95,7 @@ type MockRepeatWriteLogCommand struct {
 
 func (m MockRepeatWriteLogCommand) Execute() error {
 
-	err := m.Execute()
+	err := m.MockWriteLog.Execute()
 
 	if err != nil {
 
@@ -106,11 +106,37 @@ func (m MockRepeatWriteLogCommand) Execute() error {
 	return nil
 }
 
-// Реализовать Команду, которая повторяет Команду, выбросившую исключение.
+// Тест Реализовать Команду, которая повторяет Команду, выбросившую исключение.
 func TestMockRepeatWriteLogCommand(t *testing.T) {
 
 	msc := MockRepeatWriteLogCommand{MockWriteLogCommand{}}
 	_ = msc.Execute()
+
+	assert.EqualValues(t, GlobalLog, "error simple")
+
+}
+
+// Реализовать обработчик исключения, который ставит Команду, пишущую в лог в очередь Команд.
+var ErrToRepeatWriteLogCommandd = errors.New("err to repeat write log command")
+
+// Реализовать обработчик исключения, который ставит в очередь Команду - повторитель команды, выбросившей исключение.
+func ErrToRepeatWriteLogCommand(e chan command.Command) {
+
+	e <- MockRepeatWriteLogCommand{}
+
+}
+
+// Тест Реализовать обработчик исключения, который ставит в очередь Команду - повторитель команды, выбросившей исключение.
+func TestErrToRepeatWriteLogCommandd(t *testing.T) {
+
+	q := make(chan command.Command, 100)
+
+	cmd := MockRepeatWriteLogCommand{}
+
+	mockStore[ErrToRepeatWriteLogCommandd] = ErrToRepeatWriteLogCommand
+
+	eh := NewErrorHandler(cmd, ErrToRepeatWriteLogCommandd, mockStore, q)
+	eh.Handle()
 
 	assert.EqualValues(t, GlobalLog, "error simple")
 
