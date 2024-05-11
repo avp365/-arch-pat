@@ -36,10 +36,11 @@ func (m MockWriteLogCommand) Execute() error {
 	return nil
 }
 
-// Реализовать Команду, которая записывает информацию о выброшенном исключении в лог.
+// 4 Реализовать Команду, которая записывает информацию о выброшенном исключении в лог.
+
 func (m MockWriteLogCommand) Log(err error) {
 
-	GlobalLog = ErrSimple.Error()
+	GlobalLog = ErrToRepeatWriteLogCommand.Error()
 }
 
 func ErrHandler(e chan command.Command) {
@@ -60,7 +61,7 @@ func TestCommandRecordLog(t *testing.T) {
 
 }
 
-// Реализовать обработчик исключения, который ставит Команду, пишущую в лог в очередь Команд.
+// 5 Реализовать обработчик исключения, который ставит Команду, пишущую в лог в очередь Команд.
 var ErrToQueueCommand = errors.New("err to queue command")
 
 func ErrToQueueCommandRecordLog(e chan command.Command) {
@@ -87,7 +88,7 @@ func TestToQueueCommandRecordLog(t *testing.T) {
 
 }
 
-// Реализовать Команду, которая повторяет Команду, выбросившую исключение.
+// 6 Реализовать Команду, которая повторяет Команду, выбросившую исключение.
 type MockRepeatWriteLogCommand struct {
 	MockCommand command.Command
 }
@@ -113,7 +114,7 @@ func TestMockRepeatWriteLogCommand(t *testing.T) {
 
 }
 
-// Реализовать обработчик исключения, который ставит Команду, пишущую в лог в очередь Команд.
+// 7 Реализовать обработчик исключения, который ставит Команду, пишущую в лог в очередь Команд.
 var ErrToRepeatWriteLogCommand = errors.New("err to repeat write log command")
 
 // Реализовать обработчик исключения, который ставит в очередь Команду - повторитель команды, выбросившей исключение.
@@ -139,7 +140,7 @@ func TestErrToRepeatWriteLogCommand(t *testing.T) {
 
 }
 
-// С помощью Команд из пункта 4 и пункта 6 реализовать следующую обработку исключений:
+// 8 С помощью Команд из пункта 4 и пункта 6 реализовать следующую обработку исключений:
 func TestErrToRepeatIfErrorWriteLogCommand(t *testing.T) {
 	mockStore[ErrToRepeatWriteLogCommand] = ErrToRepeatWriteLogCommandHandle
 
