@@ -2,14 +2,13 @@ package errors_handle
 
 import (
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/avp365/arch-pat/internal/command"
 	"github.com/stretchr/testify/assert"
 )
 
-var mockStore = make(map[error]func(chan command.Command))
+var mockStore = make(map[error]func(command.Command, chan command.Command))
 
 // Реализовать Команду, которая записывает информацию о выброшенном исключении в лог.
 
@@ -44,9 +43,9 @@ func (m MockWriteLogCommand) Log(err error) {
 	GlobalLog = ErrToRepeatWriteLogCommand.Error()
 }
 
-func ErrHandler(e chan command.Command) {
+func ErrHandler(e command.Command, q chan command.Command) {
 
-	e <- MockWriteLogCommand{}
+	q <- MockWriteLogCommand{}
 }
 
 // Тест. "Реализовать Команду, которая записывает информацию о выброшенном исключении в лог.""
@@ -65,9 +64,9 @@ func TestCommandRecordLog(t *testing.T) {
 // 5 Реализовать обработчик исключения, который ставит Команду, пишущую в лог в очередь Команд.
 var ErrToQueueCommand = errors.New("err to queue command")
 
-func ErrToQueueCommandRecordLog(e chan command.Command) {
+func ErrToQueueCommandRecordLog(e command.Command, q chan command.Command) {
 
-	e <- MockWriteLogCommand{}
+	q <- MockWriteLogCommand{}
 
 }
 
@@ -119,9 +118,9 @@ func TestMockRepeatWriteLogCommand(t *testing.T) {
 var ErrToRepeatWriteLogCommand = errors.New("err to repeat write log command")
 
 // Реализовать обработчик исключения, который ставит в очередь Команду - повторитель команды, выбросившей исключение.
-func ErrToRepeatWriteLogCommandHandle(e chan command.Command) {
-	fmt.Println("ready")
-	e <- MockRepeatWriteLogCommand{}
+func ErrToRepeatWriteLogCommandHandle(e command.Command, q chan command.Command) {
+
+	q <- MockRepeatWriteLogCommand{e}
 
 }
 
@@ -148,10 +147,10 @@ func TestErrToRepeatIfErrorWriteLogCommand(t *testing.T) {
 	q := make(chan command.Command, 100)
 	q <- MockWriteLogCommand{}
 
-	for i := 0; i < 2; i++ {
+	for i := 0; i < 3; i++ {
 
 		cmd := <-q
-		fmt.Println(cmd)
+
 		if cmd != nil {
 			err := cmd.Execute()
 
