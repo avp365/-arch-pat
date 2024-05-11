@@ -43,7 +43,7 @@ func (m MockWriteLogCommand) Log(err error) {
 
 func ErrHandler(e chan command.Command) {
 
-	fmt.Println("ErrHandler")
+	e <- MockWriteLogCommand{}
 }
 
 var mockStore = make(map[error]func(chan command.Command))
@@ -95,15 +95,10 @@ type MockRepeatWriteLogCommand struct {
 
 func (m MockRepeatWriteLogCommand) Execute() error {
 
-	err := m.MockWriteLog.Execute()
+	m.MockWriteLog.Execute()
 
-	if err != nil {
+	return
 
-		return err
-
-	}
-
-	return nil
 }
 
 // Тест Реализовать Команду, которая повторяет Команду, выбросившую исключение.
@@ -117,27 +112,54 @@ func TestMockRepeatWriteLogCommand(t *testing.T) {
 }
 
 // Реализовать обработчик исключения, который ставит Команду, пишущую в лог в очередь Команд.
-var ErrToRepeatWriteLogCommandd = errors.New("err to repeat write log command")
+var ErrToRepeatWriteLogCommand = errors.New("err to repeat write log command")
 
 // Реализовать обработчик исключения, который ставит в очередь Команду - повторитель команды, выбросившей исключение.
-func ErrToRepeatWriteLogCommand(e chan command.Command) {
+func ErrToRepeatWriteLogCommandHandle(e chan command.Command) {
 
 	e <- MockRepeatWriteLogCommand{}
 
 }
 
 // Тест Реализовать обработчик исключения, который ставит в очередь Команду - повторитель команды, выбросившей исключение.
-func TestErrToRepeatWriteLogCommandd(t *testing.T) {
-
+func TestErrToRepeatWriteLogCommand(t *testing.T) {
+	mockStore[ErrToRepeatWriteLogCommand] = ErrToRepeatWriteLogCommandHandle
 	q := make(chan command.Command, 100)
 
 	cmd := MockRepeatWriteLogCommand{}
 
-	mockStore[ErrToRepeatWriteLogCommandd] = ErrToRepeatWriteLogCommand
-
-	eh := NewErrorHandler(cmd, ErrToRepeatWriteLogCommandd, mockStore, q)
+	eh := NewErrorHandler(cmd, ErrToRepeatWriteLogCommand, mockStore, q)
 	eh.Handle()
 
 	assert.EqualValues(t, GlobalLog, "error simple")
+
+}
+
+// С помощью Команд из пункта 4 и пункта 6 реализовать следующую обработку исключений:
+func TestErrToRepeatIfErrorWriteLogCommand(t *testing.T) {
+	mockStore[ErrToRepeatWriteLogCommand] = ErrToRepeatWriteLogCommandHandle
+
+	q := make(chan command.Command, 100)
+	q <- MockWriteLogCommand{}
+
+	for i := 1; i < 100; i++ {
+
+		cmd := <-q
+		err := cmd.Execute()
+
+		fmt.Println(cmd)
+		if err != nil {
+			eh := NewErrorHandler(cmd, ErrToRepeatWriteLogCommand, mockStore, q)
+			eh.Handle()
+		}
+
+	}
+
+	// cmd := MockRepeatWriteLogCommand{}
+
+	// eh := NewErrorHandler(cmd, ErrToRepeatWriteLogCommand, mockStore, q)
+	// eh.Handle()
+
+	// assert.EqualValues(t, GlobalLog, "error simple")
 
 }
