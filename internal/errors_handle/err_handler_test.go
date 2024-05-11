@@ -46,12 +46,12 @@ func ErrHandler(e chan command.Command) {
 	fmt.Println("ErrHandler")
 }
 
-var cm = make(map[error]func(chan command.Command))
+var mockStore = make(map[error]func(chan command.Command))
 
 // Тест. "Реализовать Команду, которая записывает информацию о выброшенном исключении в лог.""
 func TestCommandRecordLog(t *testing.T) {
 
-	cm[ErrSimple] = ErrHandler
+	mockStore[ErrSimple] = ErrHandler
 
 	msc := MockWriteLogCommand{}
 	err := msc.Execute()
@@ -67,23 +67,24 @@ var ErrToQueueCommand = errors.New("err to queue command")
 func ErrToQueueCommandRecordLog(e chan command.Command) {
 
 	e <- MockWriteLogCommand{}
+
 }
 
 // Тест. "Реализовать обработчик исключения, который ставит Команду, пишущую в лог в очередь Команд""
 func TestToQueueCommandRecordLog(t *testing.T) {
 
 	//очередь (канал)
-	q := make(chan command.Command)
+	q := make(chan command.Command, 100)
 
-	cm[ErrToQueueCommand] = ErrToQueueCommandRecordLog
+	mockStore[ErrToQueueCommand] = ErrToQueueCommandRecordLog
 
-	msc := MockWriteLogCommand{}
+	cmd := MockWriteLogCommand{}
 
-	eh := NewErrorHandler(q, ErrToQueueCommand, cm)
+	eh := NewErrorHandler(cmd, ErrToQueueCommand, mockStore, q)
 	eh.Handle()
 
-	nmsc := <-q
-	assert.EqualValues(t, nmsc, msc)
+	ncmd := <-q
+	assert.EqualValues(t, ncmd, cmd)
 
 }
 
