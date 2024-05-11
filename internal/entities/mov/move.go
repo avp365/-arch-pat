@@ -1,25 +1,26 @@
 package mov
 
-import (
-	"errors"
-)
+import "errors"
 
 type Move struct {
 	Obj ObjInterface
 }
+
+var ErrVariablePositionNotFound = errors.New("variable position not found1")
+var ErrVariableXPositionNotFound = errors.New("variable x position not found")
 
 func (m *Move) GetPosition() (Pos, error) {
 
 	p, ok := m.Obj.GetParameter("position").(map[string]int)
 
 	if !ok {
-		return Pos{}, errors.New("variable position not found")
+		return Pos{}, ErrVariablePositionNotFound
 	}
 
 	_, ok = p["x"]
 
 	if !ok {
-		return Pos{}, errors.New("variable x position not found")
+		return Pos{}, ErrVariableXPositionNotFound
 	}
 
 	_, ok = p["y"]
