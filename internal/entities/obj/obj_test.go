@@ -3,7 +3,7 @@ package Obj
 import (
 	"testing"
 
-	Movement "github.com/avp365/arch-pat/internal/com/mov"
+	Movement "github.com/avp365/arch-pat/internal/command/mov"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -1,10 +1,11 @@
 package errors_handle
 
 import (
-	"github.com/avp365/arch-pat/internal/com/mov"
+	"github.com/avp365/arch-pat/internal/command"
+	"github.com/avp365/arch-pat/internal/command/mov"
 )
 
-var c = make(map[error]func())
+var c = make(map[error]func(q chan command.Command))
 
 func init() {
 	c[mov.ErrVariablePositionNotFound] = mov.ErrVariablePositionNotFoundHandler
@@ -12,14 +13,14 @@ func init() {
 }
 
 type ErrorHandler struct {
-	c map[error]func()
+	c map[error]func(q chan command.Command)
 	e error
-	q string
+	q chan command.Command
 }
 
-func NewErrorHandler(err error, c map[error]func()) ErrorHandler {
+func NewErrorHandler(q chan command.Command, err error, c map[error]func(chan command.Command)) ErrorHandler {
 
-	return ErrorHandler{e: err, c: c}
+	return ErrorHandler{q: q, e: err, c: c}
 }
 
 func (eh *ErrorHandler) Handle() {
@@ -30,6 +31,6 @@ func (eh *ErrorHandler) Handle() {
 		panic("not error handler")
 	}
 
-	handler()
+	handler(eh.q)
 
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/avp365/arch-pat/internal/command"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,10 +15,10 @@ var ErrSimple = errors.New("error simple")
 
 var GlobalLog string
 
-type MockSimpleCommand struct {
+type MockWriteLogCommand struct {
 }
 
-func (m *MockSimpleCommand) Execute() error {
+func (m MockWriteLogCommand) Execute() error {
 
 	//выбрасвыем ошибку
 	err := ErrSimple
@@ -34,27 +35,55 @@ func (m *MockSimpleCommand) Execute() error {
 	return nil
 }
 
-func (m *MockSimpleCommand) Log(err error) {
+// Реализовать Команду, которая записывает информацию о выброшенном исключении в лог.
+func (m MockWriteLogCommand) Log(err error) {
 
 	GlobalLog = ErrSimple.Error()
 }
 
-func ErrSimpleHandler() {
+func ErrHandler(e chan command.Command) {
 
-	fmt.Println("ErrSimpleHandler")
+	fmt.Println("ErrHandler")
 }
 
-var cm = make(map[error]func())
+var cm = make(map[error]func(chan command.Command))
 
-func TestSimpleCommandRecordLog(t *testing.T) {
+// Тест. "Реализовать Команду, которая записывает информацию о выброшенном исключении в лог.""
+func TestCommandRecordLog(t *testing.T) {
 
-	cm[ErrSimple] = ErrSimpleHandler
+	cm[ErrSimple] = ErrHandler
 
-	msc := MockSimpleCommand{}
+	msc := MockWriteLogCommand{}
 	err := msc.Execute()
 
 	assert.EqualError(t, err, err.Error())
 	assert.EqualValues(t, GlobalLog, "error simple")
+
+}
+
+// Реализовать обработчик исключения, который ставит Команду, пишущую в лог в очередь Команд.
+var ErrToQueueCommand = errors.New("err to queue command")
+
+func ErrToQueueCommandRecordLog(e chan command.Command) {
+
+	e <- MockWriteLogCommand{}
+}
+
+// Тест. "Реализовать обработчик исключения, который ставит Команду, пишущую в лог в очередь Команд""
+func TestToQueueCommandRecordLog(t *testing.T) {
+
+	//очередь (канал)
+	q := make(chan command.Command)
+
+	cm[ErrToQueueCommand] = ErrToQueueCommandRecordLog
+
+	msc := MockWriteLogCommand{}
+
+	eh := NewErrorHandler(q, ErrToQueueCommand, cm)
+	eh.Handle()
+
+	nmsc := <-q
+	assert.EqualValues(t, nmsc, msc)
 
 }
 
