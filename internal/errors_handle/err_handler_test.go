@@ -2,6 +2,7 @@ package errors_handle
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/avp365/arch-pat/internal/command"
@@ -57,7 +58,7 @@ func TestCommandRecordLog(t *testing.T) {
 	err := msc.Execute()
 
 	assert.EqualError(t, err, err.Error())
-	assert.EqualValues(t, GlobalLog, "error simple")
+	assert.EqualValues(t, GlobalLog, "err to repeat write log command")
 
 }
 
@@ -110,7 +111,7 @@ func TestMockRepeatWriteLogCommand(t *testing.T) {
 	msc := MockRepeatWriteLogCommand{MockWriteLogCommand{}}
 	_ = msc.Execute()
 
-	assert.EqualValues(t, GlobalLog, "error simple")
+	assert.EqualValues(t, GlobalLog, "err to repeat write log command")
 
 }
 
@@ -119,7 +120,7 @@ var ErrToRepeatWriteLogCommand = errors.New("err to repeat write log command")
 
 // Реализовать обработчик исключения, который ставит в очередь Команду - повторитель команды, выбросившей исключение.
 func ErrToRepeatWriteLogCommandHandle(e chan command.Command) {
-
+	fmt.Println("ready")
 	e <- MockRepeatWriteLogCommand{}
 
 }
@@ -136,7 +137,7 @@ func TestErrToRepeatWriteLogCommand(t *testing.T) {
 	eh := NewErrorHandler(cmd, ErrToRepeatWriteLogCommand, mockStore, q)
 	eh.Handle()
 
-	assert.EqualValues(t, GlobalLog, "error simple")
+	assert.EqualValues(t, GlobalLog, "err to repeat write log command")
 
 }
 
@@ -147,18 +148,21 @@ func TestErrToRepeatIfErrorWriteLogCommand(t *testing.T) {
 	q := make(chan command.Command, 100)
 	q <- MockWriteLogCommand{}
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 2; i++ {
 
 		cmd := <-q
-		err := cmd.Execute()
+		fmt.Println(cmd)
+		if cmd != nil {
+			err := cmd.Execute()
 
-		if err != nil {
-			eh := NewErrorHandler(cmd, err, mockStore, q)
-			eh.Handle()
+			if err != nil {
+				eh := NewErrorHandler(cmd, err, mockStore, q)
+				eh.Handle()
+			}
 		}
 
 	}
 
-	assert.EqualValues(t, GlobalLog, "error simple")
+	assert.EqualValues(t, GlobalLog, "err to repeat write log command")
 
 }

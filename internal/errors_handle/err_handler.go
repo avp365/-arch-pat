@@ -5,11 +5,11 @@ import (
 	"github.com/avp365/arch-pat/internal/command/mov"
 )
 
-var store = make(map[error]func(q chan command.Command))
+var s = make(map[error]func(q chan command.Command))
 
 func init() {
-	store[mov.ErrVariablePositionNotFound] = mov.ErrVariablePositionNotFoundHandler
-	store[mov.ErrVariableXPositionNotFound] = mov.ErrVariableXPositionNotFoundHandler
+	s[mov.ErrVariablePositionNotFound] = mov.ErrVariablePositionNotFoundHandler
+	s[mov.ErrVariableXPositionNotFound] = mov.ErrVariableXPositionNotFoundHandler
 }
 
 type ErrorHandler struct {
@@ -19,9 +19,9 @@ type ErrorHandler struct {
 	queue chan command.Command
 }
 
-func NewErrorHandler(cmd command.Command, err error, store map[error]func(chan command.Command), q chan command.Command) ErrorHandler {
+func NewErrorHandler(cmd command.Command, err error, s map[error]func(chan command.Command), q chan command.Command) ErrorHandler {
 
-	return ErrorHandler{cmd: cmd, e: err, store: store, queue: q}
+	return ErrorHandler{cmd: cmd, e: err, store: s, queue: q}
 }
 
 func (eh *ErrorHandler) Handle() {
