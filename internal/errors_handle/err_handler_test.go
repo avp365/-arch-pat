@@ -141,6 +141,7 @@ func TestErrToRepeatWriteLogCommand(t *testing.T) {
 }
 
 // 8 С помощью Команд из пункта 4 и пункта 6 реализовать следующую обработку исключений:
+
 func TestErrToRepeatIfErrorWriteLogCommand(t *testing.T) {
 	mockStore[ErrToRepeatWriteLogCommand] = ErrToRepeatWriteLogCommandHandle
 
@@ -163,5 +164,90 @@ func TestErrToRepeatIfErrorWriteLogCommand(t *testing.T) {
 	}
 
 	assert.EqualValues(t, GlobalLog, "err to repeat write log command")
+
+}
+
+// 8 С помощью Команд из пункта 4 и пункта 6 реализовать следующую обработку исключений:
+type MockTwoWriteLogCommand struct {
+}
+
+func (m MockTwoWriteLogCommand) Execute() error {
+
+	//выбрасываем ошибку
+	err := ErrToTwoRepeatWriteLogCommand
+
+	//пишем в лог
+	m.Log(ErrToTwoRepeatWriteLogCommand)
+
+	if err != nil {
+
+		return err
+
+	}
+
+	return nil
+}
+func (m MockTwoWriteLogCommand) Log(err error) {
+
+	GlobalLog = err.Error()
+}
+
+type MockTwoRepeatIfErrorWriteLogCommand struct {
+	MockCommand command.Command
+}
+
+func (m MockTwoRepeatIfErrorWriteLogCommand) Execute() error {
+
+	err := m.MockCommand.Execute()
+	if err != nil {
+		err = m.MockCommand.Execute()
+	}
+
+	if err != nil {
+		err = m.MockCommand.Execute()
+	}
+
+	m.Log(ErrToRepeatWriteLogCommand)
+
+	return err
+
+}
+func (m MockTwoRepeatIfErrorWriteLogCommand) Log(err error) {
+
+	GlobalLog = err.Error()
+}
+
+var ErrToTwoRepeatWriteLogCommand = errors.New("err to two repeat write log command")
+
+// 9 Реализовать обработчик исключения, который ставит Команду, пишущую в лог в очередь Команд.
+func ErrToTwoRepeatWriteLogCommandHandle(e command.Command, q chan command.Command) {
+
+	q <- MockRepeatWriteLogCommand{e}
+
+}
+
+// Реализовать стратегию обработки исключения - повторить два раза, потом записать в лог.
+func TestErrToTwoRepeatIfErrorWriteLogCommand(t *testing.T) {
+	mockStore[ErrToTwoRepeatWriteLogCommand] = ErrToTwoRepeatWriteLogCommandHandle
+
+	q := make(chan command.Command, 100)
+	q <- MockTwoWriteLogCommand{}
+
+	for i := 0; i < 3; i++ {
+
+		cmd := <-q
+
+		if cmd != nil {
+			err := cmd.Execute()
+
+			if err != nil {
+				eh := NewErrorHandler(cmd, err, mockStore, q)
+				eh.Handle()
+			}
+		}
+
+	}
+
+	assert.EqualValues(t, GlobalLog, "err to two repeat write log command")
 
 }
