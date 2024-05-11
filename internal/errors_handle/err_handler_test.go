@@ -2,12 +2,13 @@ package errors_handle
 
 import (
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/avp365/arch-pat/internal/command"
 	"github.com/stretchr/testify/assert"
 )
+
+var mockStore = make(map[error]func(chan command.Command))
 
 // Реализовать Команду, которая записывает информацию о выброшенном исключении в лог.
 
@@ -20,8 +21,8 @@ type MockWriteLogCommand struct {
 
 func (m MockWriteLogCommand) Execute() error {
 
-	//выбрасвыем ошибку
-	err := ErrSimple
+	//выбрасываем ошибку
+	err := ErrToRepeatWriteLogCommand
 
 	//пишем в лог
 	m.Log(ErrSimple)
@@ -45,8 +46,6 @@ func ErrHandler(e chan command.Command) {
 
 	e <- MockWriteLogCommand{}
 }
-
-var mockStore = make(map[error]func(chan command.Command))
 
 // Тест. "Реализовать Команду, которая записывает информацию о выброшенном исключении в лог.""
 func TestCommandRecordLog(t *testing.T) {
@@ -90,15 +89,18 @@ func TestToQueueCommandRecordLog(t *testing.T) {
 
 // Реализовать Команду, которая повторяет Команду, выбросившую исключение.
 type MockRepeatWriteLogCommand struct {
-	MockWriteLog MockWriteLogCommand
+	MockCommand command.Command
 }
 
 func (m MockRepeatWriteLogCommand) Execute() error {
+	err := m.MockCommand.Execute()
 
-	m.MockWriteLog.Execute()
+	return err
 
-	return
+}
+func (m MockRepeatWriteLogCommand) Log(err error) {
 
+	GlobalLog = ErrSimple.Error()
 }
 
 // Тест Реализовать Команду, которая повторяет Команду, выбросившую исключение.
@@ -123,7 +125,9 @@ func ErrToRepeatWriteLogCommandHandle(e chan command.Command) {
 
 // Тест Реализовать обработчик исключения, который ставит в очередь Команду - повторитель команды, выбросившей исключение.
 func TestErrToRepeatWriteLogCommand(t *testing.T) {
+
 	mockStore[ErrToRepeatWriteLogCommand] = ErrToRepeatWriteLogCommandHandle
+
 	q := make(chan command.Command, 100)
 
 	cmd := MockRepeatWriteLogCommand{}
@@ -142,24 +146,18 @@ func TestErrToRepeatIfErrorWriteLogCommand(t *testing.T) {
 	q := make(chan command.Command, 100)
 	q <- MockWriteLogCommand{}
 
-	for i := 1; i < 100; i++ {
+	for i := 0; i < 3; i++ {
 
 		cmd := <-q
 		err := cmd.Execute()
 
-		fmt.Println(cmd)
 		if err != nil {
-			eh := NewErrorHandler(cmd, ErrToRepeatWriteLogCommand, mockStore, q)
+			eh := NewErrorHandler(cmd, err, mockStore, q)
 			eh.Handle()
 		}
 
 	}
 
-	// cmd := MockRepeatWriteLogCommand{}
-
-	// eh := NewErrorHandler(cmd, ErrToRepeatWriteLogCommand, mockStore, q)
-	// eh.Handle()
-
-	// assert.EqualValues(t, GlobalLog, "error simple")
+	assert.EqualValues(t, GlobalLog, "error simple")
 
 }
