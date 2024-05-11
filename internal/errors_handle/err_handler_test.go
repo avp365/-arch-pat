@@ -88,18 +88,30 @@ func TestToQueueCommandRecordLog(t *testing.T) {
 
 }
 
-// func TestSimpleCommandRecordLog(t *testing.T) {
+// Реализовать Команду, которая повторяет Команду, выбросившую исключение.
+type MockRepeatWriteLogCommand struct {
+	MockWriteLog MockWriteLogCommand
+}
 
-// 	cm[ErrSimple] = ErrSimpleHandler
+func (m MockRepeatWriteLogCommand) Execute() error {
 
-// 	msc := MockSimpleCommand{}
-// 	err := msc.Execute()
+	err := m.Execute()
 
-// 	if err != nil {
-// 		eh := NewErrorHandler(ErrSimple, cm)
-// 		eh.Handle()
-// 	}
+	if err != nil {
 
-// 	assert.EqualError(t, err, err.Error())
+		return err
 
-// }
+	}
+
+	return nil
+}
+
+// Реализовать Команду, которая повторяет Команду, выбросившую исключение.
+func TestMockRepeatWriteLogCommand(t *testing.T) {
+
+	msc := MockRepeatWriteLogCommand{MockWriteLogCommand{}}
+	_ = msc.Execute()
+
+	assert.EqualValues(t, GlobalLog, "error simple")
+
+}
