@@ -6,12 +6,12 @@ import (
 	"github.com/avp365/arch-pat/internal/command"
 )
 
-func ErrVariablePositionNotFoundHandler(q chan command.Command) {
+func ErrVariablePositionNotFoundHandler(command.Command, map[string]interface{}) {
 
 	fmt.Println("ErrVariablePositionNotFoundHandler")
 }
 
-func ErrVariableXPositionNotFoundHandler(q chan command.Command) {
+func ErrVariableXPositionNotFoundHandler(command.Command, map[string]interface{}) {
 
 	fmt.Println("ErrVariableXPositionNotFoundHandler")
 }
