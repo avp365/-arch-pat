@@ -3,7 +3,7 @@ package Obj
 import (
 	"errors"
 
-	Movement "github.com/avp365/arch-pat/internal/entities/mov"
+	Movement "github.com/avp365/arch-pat/internal/com/mov"
 )
 
 type Obj struct {
