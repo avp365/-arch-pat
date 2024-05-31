@@ -1,16 +1,14 @@
-package Obj
+package obj
 
 import (
 	"errors"
-
-	Movement "github.com/avp365/arch-pat/internal/command/mov"
 )
 
 type Obj struct {
 	params map[string]interface{}
 }
 
-func CreateObject() Movement.ObjInterface {
+func CreateObject() ObjInterface {
 	return Obj{make(map[string]interface{})}
 }
 

@@ -2,13 +2,15 @@ package mov
 
 import (
 	"errors"
+
+	"github.com/avp365/arch-pat/internal/entities/obj"
 )
 
-type Rotation struct {
-	Obj ObjInterface
+type RotationСommand struct {
+	Obj obj.ObjInterface
 }
 
-func (m *Rotation) GetDirection() (int, error) {
+func (m *RotationСommand) GetDirection() (int, error) {
 
 	d, ok := m.Obj.GetParameter("direction").(int)
 
@@ -19,7 +21,7 @@ func (m *Rotation) GetDirection() (int, error) {
 	return d, nil
 }
 
-func (m *Rotation) GetAngularVelocity() (int, error) {
+func (m *RotationСommand) GetAngularVelocity() (int, error) {
 
 	av, ok := m.Obj.GetParameter("angularVelocity").(int)
 
@@ -30,7 +32,7 @@ func (m *Rotation) GetAngularVelocity() (int, error) {
 	return av, nil
 }
 
-func (m *Rotation) GetDirectionNumber() (int, error) {
+func (m *RotationСommand) GetDirectionNumber() (int, error) {
 
 	dN, ok := m.Obj.GetParameter("directionNumber").(int)
 
@@ -41,12 +43,12 @@ func (m *Rotation) GetDirectionNumber() (int, error) {
 	return dN, nil
 }
 
-func (m *Rotation) SetDirection(d int) error {
+func (m *RotationСommand) SetDirection(d int) error {
 
 	return m.Obj.SetParameter("direction", d)
 }
 
-func (m *Rotation) Execute() error {
+func (m *RotationСommand) Execute() error {
 
 	d, err := m.GetDirection()
 

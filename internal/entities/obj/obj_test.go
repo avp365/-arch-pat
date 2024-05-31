@@ -1,16 +1,15 @@
-package Obj
+package obj
 
 import (
 	"testing"
 
-	Movement "github.com/avp365/arch-pat/internal/command/mov"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateObject(t *testing.T) {
 	obj := CreateObject()
 
-	assert.Implements(t, (*Movement.ObjInterface)(nil), obj)
+	assert.Implements(t, (*ObjInterface)(nil), obj)
 
 }
 

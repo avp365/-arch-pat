@@ -1,4 +1,4 @@
-package mov
+package obj
 
 type ObjInterface interface {
 	GetParameter(string) interface{}
