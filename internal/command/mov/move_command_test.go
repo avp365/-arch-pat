@@ -44,7 +44,7 @@ func (o MockObj1) SetParameter(name string, val interface{}) error {
 
 // /Для объекта, находящегося в точке (12, 5) и движущегося со скоростью (-7, 3) движение меняет положение объекта на (5, 8)
 func TestMoveVector(t *testing.T) {
-	move := Move{Obj: MockObj1{}}
+	move := MoveСommand{Obj: MockObj1{}}
 
 	assert.Equal(t, move.Execute(), nil)
 
@@ -73,7 +73,7 @@ func (o MockObj2) SetParameter(name string, val interface{}) error {
 
 // Попытка сдвинуть объект, у которого невозможно прочитать положение в пространстве, приводит к ошибке
 func TestPositionNotFound(t *testing.T) {
-	move := Move{Obj: MockObj2{}}
+	move := MoveСommand{Obj: MockObj2{}}
 
 	err := move.Execute()
 
@@ -112,7 +112,7 @@ func (o MockObj3) SetParameter(name string, val interface{}) error {
 
 // Попытка сдвинуть объект, у которого невозможно прочитать значение мгновенной скорости, приводит к ошибке
 func TestVelocityNotFound(t *testing.T) {
-	move := Move{Obj: MockObj3{}}
+	move := MoveСommand{Obj: MockObj3{}}
 
 	err := move.Execute()
 
@@ -149,7 +149,7 @@ func (o MockObj4) SetParameter(name string, val interface{}) error {
 
 // Попытка сдвинуть объект, у которого невозможно изменить положение в пространстве, приводит к ошибке
 func TestChangePositionObject(t *testing.T) {
-	move := Move{Obj: MockObj4{}}
+	move := MoveСommand{Obj: MockObj4{}}
 
 	err := move.Execute()
 

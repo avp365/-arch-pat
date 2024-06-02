@@ -1,15 +1,19 @@
 package mov
 
-import "errors"
+import (
+	"errors"
 
-type Move struct {
-	Obj ObjInterface
+	"github.com/avp365/arch-pat/internal/entities/obj"
+)
+
+type MoveСommand struct {
+	Obj obj.ObjInterface
 }
 
 var ErrVariablePositionNotFound = errors.New("variable position not found1")
 var ErrVariableXPositionNotFound = errors.New("variable x position not found")
 
-func (m *Move) GetPosition() (Pos, error) {
+func (m *MoveСommand) GetPosition() (Pos, error) {
 
 	p, ok := m.Obj.GetParameter("position").(map[string]int)
 
@@ -32,7 +36,7 @@ func (m *Move) GetPosition() (Pos, error) {
 	return Pos{X: p["x"], Y: p["y"]}, nil
 }
 
-func (m *Move) GetVelocity() (Pos, error) {
+func (m *MoveСommand) GetVelocity() (Pos, error) {
 
 	p, ok := m.Obj.GetParameter("velocity").(map[string]int)
 
@@ -55,7 +59,7 @@ func (m *Move) GetVelocity() (Pos, error) {
 	return Pos{X: p["x"], Y: p["y"]}, nil
 }
 
-func (m *Move) SetPosition(x int, y int) error {
+func (m *MoveСommand) SetPosition(x int, y int) error {
 
 	p := map[string]int{}
 
@@ -65,7 +69,7 @@ func (m *Move) SetPosition(x int, y int) error {
 	return m.Obj.SetParameter("position", p)
 }
 
-func (m *Move) Execute() error {
+func (m *MoveСommand) Execute() error {
 
 	pos, err := m.GetPosition()
 

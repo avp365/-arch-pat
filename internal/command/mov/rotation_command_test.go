@@ -33,7 +33,7 @@ func (o MockObjA1) SetParameter(name string, val interface{}) error {
 
 // /Для объекта, 360
 func TestRotation(t *testing.T) {
-	move := Rotation{Obj: MockObjA1{}}
+	move := RotationСommand{Obj: MockObjA1{}}
 
 	assert.Equal(t, move.Execute(), nil)
 
@@ -66,7 +66,7 @@ func (o MockObjA2) SetParameter(name string, val interface{}) error {
 
 // Не возможно прочитать direction
 func TestDirectionnNotFound(t *testing.T) {
-	move := Rotation{Obj: MockObjA2{}}
+	move := RotationСommand{Obj: MockObjA2{}}
 
 	err := move.Execute()
 
